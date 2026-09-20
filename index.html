@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sumire Lab TEST | すみれクラブ予約ポータル</title>
+  <style>
+    :root{
+      --bg:#fffaf5;
+      --card:#ffffff;
+      --line:#eadfd2;
+      --text:#2f2f2f;
+      --sub:#666;
+      --accent:#9a6700;
+      --accent-bg:#fff3e0;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.7;
+    }
+    .wrap{
+      width:min(860px,calc(100% - 32px));
+      margin:0 auto;
+      padding:40px 0 56px;
+    }
+    header{text-align:center;margin-bottom:28px}
+    h1{font-size:clamp(26px,5vw,40px);margin:0 0 8px}
+    .badge{
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:999px;
+      background:#f3f3f3;
+      font-size:13px;
+      font-weight:700;
+      letter-spacing:.04em;
+    }
+    .lead{margin:18px auto 0;max-width:660px;color:var(--sub)}
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:18px;
+      margin-top:28px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:22px;
+      box-shadow:0 4px 16px rgba(0,0,0,.04);
+    }
+    .card h2{margin:0 0 8px;font-size:21px}
+    .card p{margin:0 0 18px;color:var(--sub)}
+    .btn{
+      display:block;
+      text-align:center;
+      text-decoration:none;
+      background:var(--accent);
+      color:#fff;
+      font-weight:800;
+      padding:13px 16px;
+      border-radius:10px;
+    }
+    .note{
+      margin-top:24px;
+      background:var(--accent-bg);
+      border:1px solid #f0d9b6;
+      border-radius:12px;
+      padding:14px 16px;
+      color:#684600;
+      font-size:14px;
+    }
+    footer{margin-top:28px;text-align:center;color:#888;font-size:12px}
+    @media(max-width:680px){
+      .grid{grid-template-columns:1fr}
+      .wrap{padding-top:28px}
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div class="badge">Sumire Lab TEST</div>
+      <h1>すみれクラブ予約ポータル</h1>
+      <p class="lead">TEST環境です。利用する予約画面を選択してください。</p>
+    </header>
+
+    <section class="grid" aria-label="予約画面">
+      <article class="card">
+        <h2>平日の予約</h2>
+        <p>通常保育日・午前保育日の予約確認に使用します。</p>
+        <a class="btn" href="./weekday_TEST_Ver14.html">平日版TESTを開く</a>
+      </article>
+
+      <article class="card">
+        <h2>長期休暇の予約</h2>
+        <p>夏休み・冬休み・春休みの予約確認に使用します。</p>
+        <a class="btn" href="./holiday_TEST_Ver03_work.html">長期休暇版TESTを開く</a>
+      </article>
+    </section>
+
+    <div class="note">このページは開発・動作確認用のTESTポータルです。</div>
+
+    <footer>Sumire Lab TEST / すみれクラブ予約システム Ver.2.0</footer>
+  </main>
+</body>
+</html>
