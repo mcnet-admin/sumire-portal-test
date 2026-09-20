@@ -11,14 +11,14 @@
     {
       "id": "winter",
       "name": "冬休み",
-      "reservation_start": "2026-12-11",
+      "reservation_start": "2026-12-07",
       "start": "2026-12-21",
       "end": "2027-01-07"
     },
     {
       "id": "spring",
       "name": "春休み",
-      "reservation_start": "2027-03-10",
+      "reservation_start": "2027-03-08",
       "start": "2027-03-22",
       "end": "2027-04-09"
     }
