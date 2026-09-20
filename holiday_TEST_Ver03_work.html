@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>預かり保育予約（長期休暇版 TEST Ver.03 作業版）</title>
+<style>
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0;padding:20px;background:#fff3e0;color:#333}
+  .container{max-width:520px;margin:0 auto;background:#fff;padding:25px;border-radius:15px;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+  h1{font-size:20px;text-align:center;color:#ef6c00;margin:10px 0 22px}
+  .btn-back{display:inline-block;margin-bottom:15px;color:#666;text-decoration:none;font-size:14px}
+  .form-group{margin-bottom:20px}
+  label{display:block;margin-bottom:5px;font-weight:700}
+  select,input,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;box-sizing:border-box;background:#fff}
+  input:disabled,select:disabled,textarea:disabled{background:#f4f4f4;color:#999}
+  .mode-container{display:flex;gap:10px;margin-top:5px}
+  .mode-option{flex:1;cursor:pointer}
+  .mode-option input{display:none}
+  .mode-label{display:block;padding:12px 5px;text-align:center;background:#fff;border:2px solid #ddd;border-radius:8px;font-size:14px;font-weight:700;color:#666}
+  .mode-option input:checked + .mode-label{background:#fff3e0;border-color:#ef6c00;color:#ef6c00}
+  .mode-option input:disabled + .mode-label{background:#f5f5f5;border-color:#e5e5e5;color:#aaa;cursor:not-allowed}
+  .note{font-size:.85em;color:#666;margin-top:5px;line-height:1.55}
+  .note.emphasis{color:#b85d00;font-weight:700}
+  .operation-note{margin:0 0 9px;padding:8px 10px;border-radius:8px;background:#f7f7f7;color:#555;line-height:1.55}
+  .operation-note:empty{display:none}
+  .iphone-notice{font-size:.85em;color:#d93025;margin-bottom:5px;font-weight:700}
+  .error-box{color:#d32f2f;font-weight:700;display:none;margin:8px 0 12px;background:#fff5f5;padding:10px;border-radius:5px;border:1px solid #ffcdd2;line-height:1.55}
+  .info-box{margin:10px 0 16px;padding:11px 12px;border-radius:9px;background:#fff8e8;border:1px solid #f0d58b;color:#765300;font-size:13px;line-height:1.6}
+  .schedule-status{display:none;margin:-2px 0 16px;padding:9px 11px;border-radius:9px;font-size:12px;line-height:1.5}
+  .schedule-status.ok{display:block;background:#eef8f0;border:1px solid #b9ddbf;color:#2e6b38}
+  .schedule-status.warn{display:block;background:#fff3e0;border:1px solid #efc27c;color:#8a5500}
+  .schedule-status.error{display:block;background:#fff1f1;border:1px solid #f0c3c3;color:#a12626;font-weight:700}
+  .date-status{display:none;margin-top:10px;padding:10px 12px;border-radius:9px;font-size:13px;line-height:1.55}
+  .date-status.ok{display:block;background:#fff8ee;border:1px solid #efc27c;color:#8a5500}
+  .date-status.warn{display:block;background:#fff9e8;border:1px solid #f0d58b;color:#765300}
+  .date-status.error{display:block;background:#fff1f1;border:1px solid #f0c3c3;color:#a12626;font-weight:700}
+
+  .date-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .weekday-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:8px}
+  .weekday-option{cursor:pointer}
+  .weekday-option input{display:none}
+  .weekday-label{display:block;text-align:center;padding:10px 2px;border:2px solid #ddd;border-radius:8px;background:#fff;color:#666;font-weight:700;font-size:13px}
+  .weekday-option input:checked + .weekday-label{background:#fff3e0;border-color:#ef6c00;color:#ef6c00}
+  .bulk-panel{padding:15px;border:1px solid #ffd3a1;border-radius:10px;background:#fffaf5}
+  .bulk-preview{display:none;margin-top:12px;padding:12px;border-radius:10px;background:#fff;border:1px solid #f4d5b2}
+  .preview-summary{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:12px;padding:12px;border-radius:10px;background:#fff8ee;border:1px solid #f4d5b2;text-align:center}
+  .summary-count{font-size:22px;font-weight:800;line-height:1.2;color:#ef6c00}
+  .summary-label{font-size:12px;color:#666;margin-top:3px}
+  .summary-arrow{font-size:20px;color:#777;font-weight:700}
+  .preview-title{font-weight:700;color:#b85d00;margin:4px 0 8px}
+  .preview-list{display:grid;gap:6px;max-height:280px;overflow-y:auto}
+  .preview-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:#fff8ee;font-size:14px}
+  .preview-badge{white-space:nowrap;font-size:12px;font-weight:700;padding:3px 7px;border-radius:999px;background:#ffe5c2;color:#a34c00}
+  .excluded-box{margin-top:14px;padding:12px;border-radius:9px;border:1px solid #f3d58b;background:#fffaf0;font-size:13px;color:#5f4a19;line-height:1.6}
+  .excluded-box.none{border-color:#d9eadb;background:#f7fbf8;color:#57705c}
+  .excluded-title{font-weight:800;color:#9a6700;margin-bottom:7px}
+  .excluded-box.none .excluded-title{color:#2e7d32}
+  .excluded-list{display:grid;gap:6px;margin-top:8px}
+  .excluded-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:8px;background:#fff;font-size:13px;border:1px solid #f3e3b5}
+  .excluded-reason{text-align:right;font-weight:700;color:#9a6700}
+  .preview-guidance{margin:10px 0 0;font-size:12px;color:#666;line-height:1.5}
+  .bulk-action{width:100%;padding:11px;background:#fff;color:#b85d00;border:2px solid #ff9800;border-radius:9px;font-size:15px;font-weight:700;cursor:pointer;margin-top:12px}
+  .time-guide{padding:12px;border:1px dashed #e5b778;border-radius:9px;background:#fffaf5;color:#666;font-size:13px;line-height:1.5}
+  .time-card{margin-top:10px;padding:13px;border:1px solid #f1c58d;border-radius:10px;background:#fff8ee}
+  .time-card-title{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:5px;font-weight:800;color:#b85d00}
+  .time-count{white-space:nowrap;font-size:12px;padding:3px 7px;border-radius:999px;background:#ffe5c2}
+  .time-dates{display:flex;flex-wrap:wrap;gap:5px;margin:7px 0 10px}
+  .time-chip{font-size:12px;padding:4px 7px;border-radius:999px;background:#fff;border:1px solid #f1c58d;color:#765300}
+
+  .bulk-edit-guide{display:none;margin-top:10px;padding:12px;border-radius:10px;background:#f5f8ff;border:1px solid #cdd9ef;color:#41546f}
+  .bulk-edit-guide-title{font-weight:800;color:#29466f;margin-bottom:5px}
+  .bulk-edit-guide p{margin:4px 0;font-size:13px;line-height:1.55}
+  .bulk-edit-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .bulk-edit-action{padding:10px 8px;border-radius:8px;background:#fff;border:2px solid #e59a23;color:#8a5b00;font-size:14px;font-weight:800;cursor:pointer}
+  .bulk-edit-action.cancel{border-color:#d64545;color:#a12626}
+
+  .existing-panel{display:none;margin-top:12px;padding:13px;border:1px solid #d7e2ef;border-radius:10px;background:#f7faff}
+  .existing-panel.change{border-color:#efcc8a;background:#fffaf0}
+  .existing-panel.cancel{border-color:#efb8b8;background:#fff6f6}
+  .existing-heading{font-weight:800;color:#35516f;margin-bottom:6px}
+  .existing-panel.change .existing-heading{color:#8a5b00} .existing-panel.cancel .existing-heading{color:#a12626}
+  .existing-guide{font-size:13px;color:#596875;line-height:1.55;margin:0 0 10px}
+  .lookup-action{width:100%;padding:11px;border-radius:9px;border:2px solid #5d7897;background:#fff;color:#365674;font-weight:800;font-size:15px;cursor:pointer}
+  .lookup-action:disabled{border-color:#ccc;color:#999;background:#f5f5f5;cursor:not-allowed}
+  .existing-card{display:none;margin-top:11px;padding:12px;border-radius:9px;background:#fff;border:1px solid #dce5ee}
+  .existing-card-title{display:flex;align-items:center;justify-content:space-between;gap:8px;font-weight:800;margin-bottom:9px}
+  .status-pill{font-size:12px;border-radius:999px;padding:3px 8px;background:#e8f5e9;color:#2e7d32;white-space:nowrap}
+  .current-grid{display:grid;grid-template-columns:110px 1fr;gap:6px 10px;font-size:13px;line-height:1.5}
+  .current-key{color:#667;font-weight:700} .current-value{color:#333;word-break:break-word}
+  .operation-message{margin-top:10px;padding:9px 10px;border-radius:8px;font-size:13px;line-height:1.55;font-weight:700}
+  .operation-message.change{background:#fff4d6;color:#765300} .operation-message.cancel{background:#ffeded;color:#9d2424}
+  .lookup-error{display:none;margin-top:10px;padding:9px 10px;border-radius:8px;background:#fff1f1;border:1px solid #f0c3c3;color:#a12626;font-size:13px;line-height:1.5}
+  .lookup-error.info{background:#fff9e8;border-color:#f0d58b;color:#765300} .lookup-error.success{background:#eef8f0;border-color:#b9ddbf;color:#2e6b38}
+
+  .btn-submit{width:100%;padding:15px;background:#ff9800;color:#fff;border:none;border-radius:10px;font-size:18px;font-weight:700;cursor:pointer;margin-top:10px}
+  .btn-submit:disabled{background:#ccc} .btn-submit.change{background:#e59a23} .btn-submit.cancel{background:#d64545}
+  .test-note{margin:0 0 16px;padding:10px;border-radius:8px;background:#fff8e8;border:1px solid #f0d58b;color:#765300;font-weight:700;font-size:13px;line-height:1.6}
+  .field-note{font-size:12px;color:#777;margin-top:6px}
+  .result-box{display:none;margin-top:14px;padding:14px;border-radius:12px;background:#fffaf5;border:1px solid #f0d2aa;font-size:13px;line-height:1.6}
+  .result-title{font-size:17px;font-weight:800;color:#b85d00;margin-bottom:6px}
+  .virtual-test-box{margin:0 0 18px;padding:14px;border:2px solid #7b61c9;border-radius:12px;background:#faf8ff}
+  .virtual-test-title{font-weight:800;color:#5a43a6;margin-bottom:8px}
+  .virtual-test-grid{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}
+  .virtual-test-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+  .virtual-btn{padding:9px 12px;border-radius:8px;border:1px solid #7b61c9;background:#fff;color:#5a43a6;font-weight:700;cursor:pointer}
+  .virtual-btn.primary{background:#6f42c1;color:#fff}
+  .virtual-now-status{margin-top:9px;padding:8px 10px;border-radius:8px;background:#f1ecff;color:#4d378f;font-size:13px;line-height:1.5}
+  @media(max-width:420px){body{padding:12px}.container{padding:18px}.date-grid{grid-template-columns:1fr}.weekday-grid{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="index.html" class="btn-back">← ポータル画面へ戻る</a>
+  <h1>預かり保育予約 <span style="font-size:14px;color:#ef6c00;">[長期休暇版 TEST Ver.03 作業版]</span></h1>
+
+  <div class="test-note">
+    長期休暇版は<strong>一括登録を基本</strong>にしています。まとめて登録した予約も、Google側では1日ごとの予約として保存します。<br>
+    変更・取消は必要な日だけ「日別予約」に切り替えて行います。<br>
+    <span style="font-weight:600;">※この作業版では、下の「仮想現在日時」を使って、受付開始前／受付開始後、変更締切、キャンセル料の判定を確認します。</span>
+  </div>
+
+  <div class="virtual-test-box">
+    <div class="virtual-test-title">🧪 境界条件TEST用：仮想現在日時</div>
+    <label for="virtual-now" style="font-size:14px;">現在日時として扱う日時</label>
+    <div class="virtual-test-grid">
+      <input type="datetime-local" id="virtual-now" step="60">
+      <button type="button" class="virtual-btn primary" onclick="applyVirtualNow()">仮想日時を反映</button>
+    </div>
+    <div class="virtual-test-actions">
+      <button type="button" class="virtual-btn" onclick="setVirtualPreset('2026-12-13T10:00')">12/13（8日前）</button>
+      <button type="button" class="virtual-btn" onclick="setVirtualPreset('2026-12-14T10:00')">12/14（7日前）</button>
+      <button type="button" class="virtual-btn" onclick="setVirtualPreset('2026-12-20T15:30')">12/20 15:30</button>
+      <button type="button" class="virtual-btn" onclick="setVirtualPreset('2026-12-20T15:31')">12/20 15:31</button>
+      <button type="button" class="virtual-btn" onclick="clearVirtualNow()">実日時に戻す</button>
+    </div>
+    <div id="virtual-now-status" class="virtual-now-status">現在は実日時で判定しています。</div>
+    <p class="note" style="margin-bottom:0;">※仮想日時はこのHTML画面内の判定に使います。Google側のApps Scriptは、現時点では実日時で動作します。</p>
+  </div>
+  <div id="date-error" class="error-box"></div>
+  <div id="schedule-status" class="schedule-status"></div>
+
+  <div class="form-group">
+    <label>① 予約方法</label>
+    <div class="mode-container">
+      <label class="mode-option"><input type="radio" name="reservation_type" value="bulk" checked onchange="switchReservationType()"><span class="mode-label">一括登録</span></label>
+      <label class="mode-option"><input type="radio" name="reservation_type" value="single" onchange="switchReservationType()"><span class="mode-label">日別予約</span></label>
+    </div>
+    <p id="reservation-note" class="note emphasis">※長期休暇は、期間を指定してまとめて予約できます。初期状態では月〜日すべてを対象にします。</p>
+  </div>
+
+  <div class="form-group">
+    <label>② クラス</label>
+    <select id="class-select" onchange="updateStudentList()"><option value="">Googleから読み込み中...</option></select>
+  </div>
+
+  <div class="form-group">
+    <label>③ 園児名</label>
+    <select id="student-select" disabled onchange="resetExistingReservation()"><option value="">クラスを先に選択してください</option></select>
+    <p id="children-source-note" class="note">※園児情報はGoogle側の非公開マスタから取得します。</p>
+  </div>
+
+  <div class="form-group">
+    <label>④ 操作種別</label>
+    <p id="operation-note" class="operation-note"></p>
+    <div class="mode-container">
+      <label class="mode-option"><input type="radio" name="v_mode" value="新規" checked onchange="switchOperationMode()"><span class="mode-label">新規</span></label>
+      <label class="mode-option"><input type="radio" name="v_mode" value="変更" onchange="switchOperationMode()"><span class="mode-label">変更</span></label>
+      <label class="mode-option"><input type="radio" name="v_mode" value="取消" onchange="switchOperationMode()"><span class="mode-label">取消</span></label>
+    </div>
+    <div id="bulk-edit-guide" class="bulk-edit-guide">
+      <div class="bulk-edit-guide-title">変更・取消する場合</div>
+      <p>一括登録した予約も、変更・取消は<strong>1日ずつ</strong>行います。</p>
+      <p>下のボタンから日別予約へ切り替えて、変更・取消したい利用日を選んでください。</p>
+      <div class="bulk-edit-actions">
+        <button type="button" class="bulk-edit-action" onclick="switchToSingleOperation('変更')">日別で変更する</button>
+        <button type="button" class="bulk-edit-action cancel" onclick="switchToSingleOperation('取消')">日別で取消する</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="bulk-date-group" class="form-group bulk-panel">
+    <label>⑤ 利用期間・曜日</label>
+    <p class="note emphasis">開始日・終了日を指定すると、初期状態では月〜日すべてを対象にします。利用しない曜日がある場合だけ選択を外してください。</p>
+    <div class="date-grid">
+      <div><label for="bulk-start" style="font-size:14px;">開始日</label><input type="date" id="bulk-start" onchange="handleBulkStartChange()"></div>
+      <div><label for="bulk-end" style="font-size:14px;">終了日</label><input type="date" id="bulk-end" onchange="handleBulkEndChange()"></div>
+    </div>
+    <p class="note" style="margin-top:8px;">※終了日は開始日より前には設定できません。開始日を選ぶと、同じ長期休暇の終了日までに自動で範囲を限定します。</p>
+    <div style="margin-top:14px;">
+      <label style="font-size:14px;">利用する曜日</label>
+      <div class="weekday-grid">
+        <label class="weekday-option"><input type="checkbox" name="bulk_weekday" value="1" checked onchange="clearBulkPreview()"><span class="weekday-label">月</span></label>
+        <label class="weekday-option"><input type="checkbox" name="bulk_weekday" value="2" checked onchange="clearBulkPreview()"><span class="weekday-label">火</span></label>
+        <label class="weekday-option"><input type="checkbox" name="bulk_weekday" value="3" checked onchange="clearBulkPreview()"><span class="weekday-label">水</span></label>
+        <label class="weekday-option"><input type="checkbox" name="bulk_weekday" value="4" checked onchange="clearBulkPreview()"><span class="weekday-label">木</span></label>
+        <label class="weekday-option"><input type="checkbox" name="bulk_weekday" value="5" checked onchange="clearBulkPreview()"><span class="weekday-label">金</span></label>
+        <label class="weekday-option"><input type="checkbox" name="bulk_weekday" value="6" checked onchange="clearBulkPreview()"><span class="weekday-label">土</span></label>
+        <label class="weekday-option"><input type="checkbox" name="bulk_weekday" value="0" checked onchange="clearBulkPreview()"><span class="weekday-label">日</span></label>
+      </div>
+    </div>
+    <button type="button" class="bulk-action" onclick="buildBulkPreview(true)">対象日を確認する</button>
+    <p class="note">※長期休暇期間外、預かりなしの日、受付開始前、締切後の日は登録対象から外し、理由を表示します。</p>
+    <div id="bulk-preview" class="bulk-preview">
+      <div id="bulk-preview-summary" class="preview-summary"></div>
+      <div id="bulk-preview-title" class="preview-title"></div>
+      <div id="bulk-preview-list" class="preview-list"></div>
+      <div id="bulk-excluded" class="excluded-box"></div>
+      <p class="preview-guidance">※登録予定日を確認してから、共通の利用時間を指定してください。異なる時間にしたい日は、登録後に日別で変更できます。</p>
+    </div>
+  </div>
+
+  <div id="single-date-group" class="form-group" style="display:none;">
+    <label>⑤ 利用希望日</label>
+    <p class="iphone-notice">※日付の枠内をタップして選択してください</p>
+    <input type="date" id="date-select" onchange="handleDateChange()">
+    <p class="note">※長期休暇の日程は <code>schedule.json</code> を基準に判定します。</p>
+    <div id="date-status" class="date-status"></div>
+
+    <div id="existing-reservation-panel" class="existing-panel">
+      <div id="existing-heading" class="existing-heading">現在の予約を確認</div>
+      <p id="existing-guide" class="existing-guide"></p>
+      <button id="lookup-reservation-btn" type="button" class="lookup-action" onclick="lookupExistingReservation()">現在の予約を確認する</button>
+      <div id="lookup-error" class="lookup-error"></div>
+      <div id="existing-card" class="existing-card">
+        <div class="existing-card-title"><span>現在の予約内容</span><span id="existing-status" class="status-pill">有効</span></div>
+        <div class="current-grid">
+          <div class="current-key">利用日</div><div id="existing-date" class="current-value"></div>
+          <div class="current-key">休暇区分</div><div id="existing-day-type" class="current-value"></div>
+          <div class="current-key">利用時間</div><div id="existing-time" class="current-value"></div>
+          <div class="current-key">お迎え</div><div id="existing-pickup" class="current-value"></div>
+          <div class="current-key">その他</div><div id="existing-memo" class="current-value"></div>
+        </div>
+        <div id="existing-operation-message" class="operation-message"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="time-form-group" class="form-group">
+    <label>⑥ 利用時間</label>
+    <div id="bulk-time-panel">
+      <div id="bulk-time-guide" class="time-guide">「対象日を確認する」を押すと、一括登録する利用時間を選べるようになります。</div>
+      <div id="holiday-time-card" class="time-card" style="display:none;">
+        <div class="time-card-title"><span>長期休暇の利用時間</span><span id="holiday-time-count" class="time-count"></span></div>
+        <div id="holiday-time-dates" class="time-dates"></div>
+        <p class="note">この利用時間を、上の登録予定日に共通して適用します。</p>
+        <select id="bulk-time-select"><option value="">対象日を先に確認してください</option></select>
+      </div>
+    </div>
+    <div id="single-time-panel" style="display:none;">
+      <select id="time-select" disabled><option value="">利用希望日を先に選択してください</option></select>
+    </div>
+    <p class="note">※料金はHTMLへ固定せず、Google側の料金マスタで判定する設計です。</p>
+    <p class="field-note">※早朝預かり（8:00〜8:30）の扱いは、平日版と共通仕様として別途確認します。</p>
+  </div>
+
+  <div id="pickup-form-group" class="form-group"><label>⑦ お迎え・同伴</label><select id="pickup"><option value="母">母</option><option value="父">父</option><option value="その他">その他</option></select></div>
+  <div id="memo-form-group" class="form-group"><label>⑧ その他（任意）</label><textarea id="memo" rows="2"></textarea></div>
+
+  <div class="info-box"><strong>長期休暇の取消について</strong><br>利用日の7日前以降は、予約料金の全額がキャンセル料となる運用です。取消は日別予約に切り替えて行います。</div>
+  <button id="submit-btn" class="btn-submit" onclick="handleConfirm()">一括登録する</button>
+  <div id="result" class="result-box"></div>
+</div>
+
+<script>
+const WEB_APP_URL='https://script.google.com/macros/s/AKfycbwSqtBljd7I6Fa1rM5bJvXFojvO2Wr0nVOuMhVAzlrHRarpP7TfhUN7KhTdrv52UYqz/exec';
+const TEST_BYPASS_RESERVATION_START=false;
+let VIRTUAL_NOW=null;
+const HOLIDAY_TIME_OPTIONS=[
+  {value:'11:45',code:'HD_1145',label:'～11:45'},
+  {value:'13:00',code:'HD_1300',label:'～13:00'},
+  {value:'14:00',code:'HD_1400',label:'～14:00'},
+  {value:'15:00',code:'HD_1500',label:'～15:00'},
+  {value:'16:00',code:'HD_1600',label:'～16:00'},
+  {value:'16:30',code:'HD_1630',label:'～16:30'},
+  {value:'17:00',code:'HD_1700',label:'16:30～17:00（時間外）'},
+  {value:'17:30',code:'HD_1730',label:'16:30～17:30（時間外）'},
+  {value:'18:00',code:'HD_1800',label:'16:30～18:00（時間外）'}
+];
+const FALLBACK_SCHEDULE={
+  "school_year": 2026,
+  "long_holidays": [
+    {
+      "id": "summer",
+      "name": "夏休み",
+      "reservation_start": "2026-07-04",
+      "start": "2026-07-18",
+      "end": "2026-08-30"
+    },
+    {
+      "id": "winter",
+      "name": "冬休み",
+      "reservation_start": "2026-12-11",
+      "start": "2026-12-21",
+      "end": "2027-01-07"
+    },
+    {
+      "id": "spring",
+      "name": "春休み",
+      "reservation_start": "2027-03-10",
+      "start": "2027-03-22",
+      "end": "2027-04-09"
+    }
+  ],
+  "no_care_events": [
+    {
+      "date": "2026-04-01",
+      "name": "家庭保育協力日"
+    },
+    {
+      "date": "2026-04-08",
+      "name": "登園日"
+    },
+    {
+      "date": "2026-04-13",
+      "name": "始業式"
+    },
+    {
+      "date": "2026-07-17",
+      "name": "終業式"
+    },
+    {
+      "date": "2026-08-04",
+      "name": "家庭保育協力日"
+    },
+    {
+      "date": "2026-08-11",
+      "name": "お盆休み"
+    },
+    {
+      "date": "2026-08-12",
+      "name": "お盆休み"
+    },
+    {
+      "date": "2026-08-13",
+      "name": "お盆休み"
+    },
+    {
+      "date": "2026-08-14",
+      "name": "お盆休み"
+    },
+    {
+      "date": "2026-08-15",
+      "name": "お盆休み"
+    },
+    {
+      "date": "2026-08-16",
+      "name": "お盆休み"
+    },
+    {
+      "date": "2026-08-31",
+      "name": "始業式"
+    },
+    {
+      "date": "2026-09-10",
+      "name": "創立記念日"
+    },
+    {
+      "date": "2026-09-17",
+      "name": "家庭保育協力日（お泊まり保育）"
+    },
+    {
+      "date": "2026-09-18",
+      "name": "年長以外休園（お泊まり保育）"
+    },
+    {
+      "date": "2026-10-21",
+      "name": "運動会"
+    },
+    {
+      "date": "2026-12-18",
+      "name": "終業式"
+    },
+    {
+      "date": "2026-12-29",
+      "name": "年末年始の休業"
+    },
+    {
+      "date": "2026-12-30",
+      "name": "年末年始の休業"
+    },
+    {
+      "date": "2026-12-31",
+      "name": "年末年始の休業"
+    },
+    {
+      "date": "2027-01-01",
+      "name": "年末年始の休業"
+    },
+    {
+      "date": "2027-01-02",
+      "name": "年末年始の休業"
+    },
+    {
+      "date": "2027-01-03",
+      "name": "年末年始の休業"
+    },
+    {
+      "date": "2027-01-08",
+      "name": "始業式"
+    },
+    {
+      "date": "2027-03-18",
+      "name": "修了式"
+    },
+    {
+      "date": "2027-03-19",
+      "name": "卒園式"
+    },
+    {
+      "date": "2027-03-31",
+      "name": "家庭保育協力日"
+    }
+  ],
+  "morning_care_days": [
+    {
+      "date": "2026-06-24"
+    },
+    {
+      "date": "2026-07-15"
+    },
+    {
+      "date": "2026-07-16"
+    },
+    {
+      "date": "2026-08-03"
+    },
+    {
+      "date": "2026-08-05"
+    },
+    {
+      "date": "2026-08-06"
+    },
+    {
+      "date": "2026-09-02"
+    },
+    {
+      "date": "2026-09-30"
+    },
+    {
+      "date": "2026-10-28"
+    },
+    {
+      "date": "2026-11-25"
+    },
+    {
+      "date": "2026-12-16"
+    },
+    {
+      "date": "2027-01-27"
+    },
+    {
+      "date": "2027-02-24"
+    },
+    {
+      "date": "2027-03-03"
+    }
+  ]
+};
+
+const FALLBACK_CHILDREN=[
+  {child_id:'test001',class_name:'TP1',name:'テスト園児001'},
+  {child_id:'test002',class_name:'HY1',name:'テスト園児002'},
+  {child_id:'test003',class_name:'HY2',name:'テスト園児003'},
+  {child_id:'test004',class_name:'KT1',name:'テスト園児004'},
+  {child_id:'test005',class_name:'KT2',name:'テスト園児005'},
+  {child_id:'test006',class_name:'HK1',name:'テスト園児006'},
+  {child_id:'test007',class_name:'HK2',name:'テスト園児007'},
+  {child_id:'test008',class_name:'HY2',name:'テスト園児008'},
+  {child_id:'test009',class_name:'KT1',name:'テスト園児009'}
+];
+
+let studentData={};
+let schedule=JSON.parse(JSON.stringify(FALLBACK_SCHEDULE));
+let scheduleReady=false;
+let scheduleSource='';
+let currentReservation=null;
+let reservationLookupKey='';
+let currentJudgement=null;
+let bulkCandidates=[];
+let bulkExcluded=[];
+
+function getNow(){
+  return VIRTUAL_NOW ? new Date(VIRTUAL_NOW.getTime()) : new Date();
+}
+
+function parseDateTimeLocal(value){
+  const m=String(value||'').match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/);
+  if(!m)return null;
+  const d=new Date(Number(m[1]),Number(m[2])-1,Number(m[3]),Number(m[4]),Number(m[5]),0,0);
+  return isNaN(d.getTime())?null:d;
+}
+
+function formatJPDateTime(d){
+  if(!(d instanceof Date)||isNaN(d.getTime()))return '';
+  return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function refreshDateMinimums(){
+  const today=formatISODate(todayLocal());
+  const single=document.getElementById('date-select');
+  const start=document.getElementById('bulk-start');
+  const end=document.getElementById('bulk-end');
+  if(single)single.min=today;
+  if(start)start.min=today;
+  if(end)end.min=start?.value||today;
+}
+
+function resetForVirtualTimeChange(){
+  clearBulkPreview();
+  resetExistingReservation();
+  refreshDateMinimums();
+  const single=document.getElementById('date-select');
+  if(single?.value)handleDateChange();
+}
+
+function applyVirtualNow(){
+  const input=document.getElementById('virtual-now');
+  const d=parseDateTimeLocal(input?.value);
+  if(!d){alert('仮想現在日時を入力してください。');return;}
+  VIRTUAL_NOW=d;
+  const status=document.getElementById('virtual-now-status');
+  if(status)status.textContent=`仮想現在日時：${formatJPDateTime(VIRTUAL_NOW)} として判定中です。`;
+  resetForVirtualTimeChange();
+}
+
+function setVirtualPreset(value){
+  const input=document.getElementById('virtual-now');
+  if(input)input.value=value;
+  applyVirtualNow();
+}
+
+function clearVirtualNow(){
+  VIRTUAL_NOW=null;
+  const input=document.getElementById('virtual-now');
+  if(input)input.value='';
+  const status=document.getElementById('virtual-now-status');
+  if(status)status.textContent='現在は実日時で判定しています。';
+  resetForVirtualTimeChange();
+}
+
+window.onload=async()=>{await init();};
+
+function isValidScheduleData(data){return Boolean(data && Array.isArray(data.long_holidays) && Array.isArray(data.no_care_events) && Array.isArray(data.morning_care_days));}
+function updateScheduleStatus(){
+  const el=document.getElementById('schedule-status');el.className='schedule-status';
+  if(scheduleReady && scheduleSource==='schedule.json'){el.classList.add('ok');el.textContent=`園予定データ：schedule.json 読み込み済み（${schedule.school_year||'年度未設定'}年度）`;return;}
+  if(scheduleReady && scheduleSource==='内蔵TEST'){el.classList.add('warn');el.textContent='園予定データ：ローカルTESTのため内蔵予定を使用しています。GitHub Pagesでは schedule.json を使用します。';return;}
+  el.classList.add('error');el.textContent='園予定データを読み込めません。誤登録を防ぐため、予約判定を停止しています。';
+}
+
+async function init(){
+  try{
+    const ts=Date.now();
+    try{
+      const r=await fetch(`data/calendar/schedule.json?v=${ts}`);if(!r.ok)throw new Error(`schedule.json HTTP ${r.status}`);
+      const loaded=await r.json();if(!isValidScheduleData(loaded))throw new Error('schedule.json の形式が不正です');
+      schedule=loaded;scheduleReady=true;scheduleSource='schedule.json';
+    }catch(e){
+      if(location.protocol==='file:'){schedule=JSON.parse(JSON.stringify(FALLBACK_SCHEDULE));scheduleReady=true;scheduleSource='内蔵TEST';console.warn('schedule.json を読み込めないため、ローカルTESTでは内蔵予定を使用します。',e);}
+      else{scheduleReady=false;scheduleSource='';console.error('schedule.json の読み込みに失敗しました。予約判定を停止します。',e);}
+    }
+    updateScheduleStatus();
+
+    // ローカル(file://)ではブラウザの外部通信制限によりApps Script取得が安定しないため、
+    // 画面確認用のTEST園児9名を内蔵データから表示する。
+    // GitHub Pages上では従来どおりGoogle側のchildrenを取得する。
+    let children=[];
+    const childrenNote=document.getElementById('children-source-note');
+    if(location.protocol==='file:'){
+      children=FALLBACK_CHILDREN;
+      if(childrenNote)childrenNote.textContent='※ローカルTESTのため、内蔵のダミー園児9名を表示しています。GitHub PagesではGoogle側の非公開マスタから取得します。';
+    }else{
+      const res=await fetch(`${WEB_APP_URL}?action=children`);
+      const result=await res.json();
+      if(result.status!=="success" || !Array.isArray(result.children))throw new Error(result.message||'園児マスタを取得できませんでした');
+      children=result.children;
+      if(childrenNote)childrenNote.textContent='※園児情報はGoogle側の非公開マスタから取得します。';
+    }
+
+    studentData={};
+    children.forEach(c=>{const cls=c.class_name||c.class||'';if(!cls)return;if(!studentData[cls])studentData[cls]=[];studentData[cls].push({id:c.child_id,name:c.name});});
+    const cs=document.getElementById('class-select');cs.innerHTML='<option value="">選択してください</option>';Object.keys(studentData).sort().forEach(cls=>cs.add(new Option(cls,cls)));
+    const today=formatISODate(todayLocal());document.getElementById('date-select').min=today;document.getElementById('bulk-start').min=today;document.getElementById('bulk-end').min=today;
+    // Chrome等が前回のフォーム値を復元する場合があるため、開始日・終了日の整合を初期化時にも確認する。
+    const bs=document.getElementById('bulk-start'),be=document.getElementById('bulk-end');
+    if(bs.value){
+      be.min=bs.value;
+      const h=getLongHoliday(bs.value);
+      be.max=h?.end||'';
+      if(!be.value || be.value<bs.value || (be.max && be.value>be.max))be.value=bs.value;
+    }
+    // 休日版は長期休暇期間の全曜日を初期対象とする。ブラウザのフォーム復元よりこの初期値を優先する。
+    document.querySelectorAll('input[name="bulk_weekday"]').forEach(el=>{el.checked=true;});
+    switchReservationType();
+  }catch(e){document.getElementById('class-select').innerHTML='<option value="">読み込みに失敗しました</option>';showError('⚠️ 初期データを読み込めませんでした。ページを再読み込みしてください。');console.error(e);}
+}
+
+function updateStudentList(){
+  const cls=document.getElementById('class-select').value;const s=document.getElementById('student-select');s.innerHTML='<option value="">選択してください</option>';
+  if(cls && studentData[cls]){studentData[cls].forEach(item=>s.add(new Option(item.name,item.id)));s.disabled=false;}else s.disabled=true;
+  resetExistingReservation();
+}
+function getReservationType(){return document.querySelector('input[name="reservation_type"]:checked')?.value||'bulk';}
+function getOperationMode(){return document.querySelector('input[name="v_mode"]:checked')?.value||'新規';}
+function switchToSingleOperation(mode){
+  const single=document.querySelector('input[name="reservation_type"][value="single"]');const target=document.querySelector(`input[name="v_mode"][value="${mode}"]`);
+  if(!single||!target)return;single.checked=true;switchReservationType();target.checked=true;switchOperationMode();
+  const d=document.getElementById('date-select');setTimeout(()=>{try{d.focus({preventScroll:false});}catch(e){d.focus();}},0);
+}
+function switchReservationType(){
+  const rt=getReservationType();const single=document.getElementById('single-date-group');const bulk=document.getElementById('bulk-date-group');const guide=document.getElementById('bulk-edit-guide');const modes=[...document.querySelectorAll('input[name="v_mode"]')];
+  const singleTime=document.getElementById('single-time-panel');const bulkTime=document.getElementById('bulk-time-panel');const note=document.getElementById('reservation-note');
+  if(rt==='bulk'){
+    bulk.style.display='block';single.style.display='none';bulkTime.style.display='block';singleTime.style.display='none';note.textContent='※長期休暇は、期間と曜日を指定してまとめて予約できます。';
+    document.querySelector('input[name="v_mode"][value="新規"]').checked=true;modes.forEach(m=>m.disabled=(m.value!=='新規'));document.getElementById('operation-note').textContent='※一括登録は「新規」のみです。変更・取消は日別で行います。';guide.style.display='block';document.getElementById('existing-reservation-panel').style.display='none';
+  }else{
+    bulk.style.display='none';single.style.display='block';bulkTime.style.display='none';singleTime.style.display='block';note.textContent=getOperationMode()==='新規'?'※必要な日を1日ずつ予約します。':'※変更・取消する日を1日ずつ選びます。';modes.forEach(m=>m.disabled=false);guide.style.display='none';switchOperationMode();
+  }
+  hideError();hideResult();updateSubmitButton();
+}
+function switchOperationMode(){
+  if(getReservationType()==='bulk'){document.querySelector('input[name="v_mode"][value="新規"]').checked=true;updateSubmitButton();return;}
+  const mode=getOperationMode();const panel=document.getElementById('existing-reservation-panel');const note=document.getElementById('operation-note');panel.className='existing-panel';
+  if(mode==='新規'){panel.style.display='none';note.textContent='※長期休暇の日別新規予約です。';}
+  else{panel.style.display='block';panel.classList.add(mode==='変更'?'change':'cancel');document.getElementById('existing-heading').textContent=mode==='変更'?'変更する予約を確認':'取り消す予約を確認';document.getElementById('existing-guide').textContent='園児と利用日を選び、「現在の予約を確認する」を押してください。';note.textContent=mode==='変更'?'※利用時間の変更は利用日前日の15:30まで受け付けます。':'※利用日の7日前からは予約料金の全額がキャンセル料となります。';}
+  resetExistingReservation();handleDateChange();updateSubmitButton();
+}
+
+function parseISODate(s){if(!/^\d{4}-\d{2}-\d{2}$/.test(s||''))return null;const [y,m,d]=s.split('-').map(Number);const dt=new Date(y,m-1,d);return dt.getFullYear()===y&&dt.getMonth()===m-1&&dt.getDate()===d?dt:null;}
+function formatISODate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function formatJPDate(s){const d=parseISODate(s);return d?`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`:s;}
+function formatShortDate(s){const d=parseISODate(s);return d?`${d.getMonth()+1}/${d.getDate()}`:s;}
+function todayLocal(){const n=getNow();return new Date(n.getFullYear(),n.getMonth(),n.getDate());}
+function getLongHoliday(dateStr){const list=Array.isArray(schedule.long_holidays)?schedule.long_holidays:[];return list.find(h=>h.start&&h.end&&dateStr>=h.start&&dateStr<=h.end)||null;}
+function getNoCareEvent(dateStr){const list=Array.isArray(schedule.no_care_events)?schedule.no_care_events:[];return list.find(e=>e.date===dateStr)||null;}
+function isPastCutoff(dateStr){const dt=parseISODate(dateStr);if(!dt)return true;const limit=new Date(dt.getFullYear(),dt.getMonth(),dt.getDate()-1,15,30,0,0);return getNow()>limit;}
+function daysUntil(dateStr){const dt=parseISODate(dateStr);if(!dt)return null;return Math.floor((new Date(dt.getFullYear(),dt.getMonth(),dt.getDate())-todayLocal())/86400000);}
+function beforeReservationStart(holiday){if(!holiday||!holiday.reservation_start)return false;return formatISODate(todayLocal())<String(holiday.reservation_start);}
+function classifyHolidayDate(dateStr,mode='新規'){
+  if(!dateStr)return null;if(!scheduleReady)return {allowed:false,type:'schedule_error',reason:'園予定データを確認できないため予約できません。'};
+  const dt=parseISODate(dateStr);if(!dt)return {allowed:false,type:'invalid',reason:'日付を確認してください。'};if(dt<todayLocal())return {allowed:false,type:'past',reason:'過去の日付は選択できません。'};
+  const holiday=getLongHoliday(dateStr);if(!holiday)return {allowed:false,type:'weekday',route:'weekday',reason:'長期休暇期間ではありません。',holiday:null};
+  const event=getNoCareEvent(dateStr);if(event)return {allowed:false,type:'no_care',reason:`${event.name||'園行事'}［預かりなし］`,holiday};
+  if(mode==='新規'&&!TEST_BYPASS_RESERVATION_START&&beforeReservationStart(holiday))return {allowed:false,type:'before_open',reason:`${holiday.name||'長期休暇'}の予約受付は ${formatJPDate(String(holiday.reservation_start))} からです。`,holiday};
+  if(mode!=='取消'&&isPastCutoff(dateStr))return {allowed:false,type:'cutoff',reason:'前日15:30の締切超過',holiday};
+  const d=daysUntil(dateStr);return {allowed:true,type:'holiday',day_type:'holiday',period:'long_holiday',careAvailable:true,dayLength:'full',holiday,label:holiday.name||'長期休暇',cancelFee:(mode==='取消'&&d!==null&&d<=7),daysUntil:d,reason:''};
+}
+
+function handleDateChange(){
+  hideError();const date=document.getElementById('date-select').value;const status=document.getElementById('date-status');status.className='date-status';status.textContent='';currentJudgement=null;resetExistingReservation(false);resetSingleTimeSelect();if(!date)return;
+  const j=classifyHolidayDate(date,getOperationMode());currentJudgement=j;
+  if(!j.allowed){status.classList.add('error');if(j.route==='weekday')status.innerHTML=`${escapeHtml(j.reason)}<br><a href="weekday_TEST_Ver14.html" style="color:blue;">[平日版はこちら]</a>`;else status.textContent=j.reason;updateSubmitButton();return;}
+  status.classList.add(j.cancelFee?'warn':'ok');status.textContent=j.cancelFee?`${j.holiday.name||'長期休暇'}：取消は可能ですが、利用日の7日前以降のため予約料金の全額がキャンセル料となります。`:`${j.holiday.name||'長期休暇'}：予約対象日です。`;
+  if(getOperationMode()==='取消')document.getElementById('time-select').disabled=true;else populateTimeSelect('time-select');updateSubmitButton();
+}
+function populateTimeSelect(id){
+  const s=document.getElementById(id);
+  const selectedValue=s.value; // 再描画前の選択値を保持
+  s.innerHTML='<option value="">選択してください</option>';
+  HOLIDAY_TIME_OPTIONS.forEach(item=>{
+    const o=new Option(item.label,item.value);
+    o.dataset.timeCode=item.code;
+    s.add(o);
+  });
+  // 「対象日を確認する」の再判定で利用時間が消えないように復元
+  if(selectedValue && HOLIDAY_TIME_OPTIONS.some(item=>item.value===selectedValue)){
+    s.value=selectedValue;
+  }
+  s.disabled=false;
+}
+function resetSingleTimeSelect(){const s=document.getElementById('time-select');s.innerHTML='<option value="">利用希望日を先に選択してください</option>';s.disabled=true;}
+function getSelectedTime(id){const s=document.getElementById(id);const o=s.options[s.selectedIndex];if(!s.value)return null;return {end_time:s.value,time_code:o?.dataset.timeCode||'',label:o?.text||s.value};}
+function findTimeOption(res){if(!res)return null;if(res.time_code){const x=HOLIDAY_TIME_OPTIONS.find(o=>o.code===res.time_code);if(x)return x;}return HOLIDAY_TIME_OPTIONS.find(o=>o.value===res.end_time)||null;}
+
+function handleBulkStartChange(){
+  clearBulkPreview();
+  const startEl=document.getElementById('bulk-start');
+  const endEl=document.getElementById('bulk-end');
+  const startStr=startEl.value;
+  if(!startStr){
+    endEl.min=startEl.min||'';
+    endEl.max='';
+    return;
+  }
+
+  // 終了日は開始日より前を選べないようにする。
+  endEl.min=startStr;
+
+  // 選んだ開始日が長期休暇内なら、その休暇の終了日までに限定する。
+  const holiday=getLongHoliday(startStr);
+  endEl.max=holiday?.end||'';
+
+  // ブラウザが以前の入力値を復元していて、終了日が開始日より前なら自動で補正する。
+  if(!endEl.value || endEl.value<startStr || (endEl.max && endEl.value>endEl.max)){
+    endEl.value=startStr;
+  }
+}
+
+function handleBulkEndChange(){
+  clearBulkPreview();
+  const startEl=document.getElementById('bulk-start');
+  const endEl=document.getElementById('bulk-end');
+  if(!startEl.value||!endEl.value)return;
+
+  if(endEl.value<startEl.value){
+    endEl.value=startEl.value;
+    showError('⚠️ 終了日は開始日以降を指定してください。開始日と同じ日に戻しました。');
+    return;
+  }
+
+  const holiday=getLongHoliday(startEl.value);
+  if(holiday?.end && endEl.value>holiday.end){
+    endEl.value=holiday.end;
+    showError(`⚠️ 一括登録は同じ長期休暇の範囲内で指定してください。終了日を ${formatJPDate(holiday.end)} に合わせました。`);
+  }
+}
+
+function clearBulkPreview(){bulkCandidates=[];bulkExcluded=[];document.getElementById('bulk-preview').style.display='none';document.getElementById('holiday-time-card').style.display='none';const s=document.getElementById('bulk-time-select');s.innerHTML='<option value="">対象日を先に確認してください</option>';s.disabled=true;hideResult();updateSubmitButton();}
+function selectedBulkWeekdays(){return [...document.querySelectorAll('input[name="bulk_weekday"]:checked')].map(el=>Number(el.value));}
+function buildBulkPreview(showValidationMessage=false){
+  hideError();hideResult();const startStr=document.getElementById('bulk-start').value;const endStr=document.getElementById('bulk-end').value;const weekdays=selectedBulkWeekdays();
+  if(!startStr||!endStr||!weekdays.length){clearBulkPreview();if(showValidationMessage)showError('⚠️ 一括登録では、開始日・終了日・利用する曜日を選択してください。');return false;}
+  const start=parseISODate(startStr),end=parseISODate(endStr);if(!start||!end||start>end){clearBulkPreview();if(showValidationMessage)showError('⚠️ 利用期間を確認してください。終了日は開始日以降を指定してください。');return false;}
+  const span=Math.floor((end-start)/86400000)+1;if(span>100){clearBulkPreview();if(showValidationMessage)showError('⚠️ 長期休暇の一括指定は100日以内で設定してください。');return false;}
+  bulkCandidates=[];bulkExcluded=[];const cursor=new Date(start);
+  while(cursor<=end){const dow=cursor.getDay();if(weekdays.includes(dow)){const dateStr=formatISODate(cursor);const j=classifyHolidayDate(dateStr,'新規');if(j.allowed)bulkCandidates.push({...j,date:dateStr});else bulkExcluded.push({...j,date:dateStr});}cursor.setDate(cursor.getDate()+1);}
+  renderBulkPreview();return bulkCandidates.length>0;
+}
+function renderBulkPreview(){
+  const preview=document.getElementById('bulk-preview'),summary=document.getElementById('bulk-preview-summary'),title=document.getElementById('bulk-preview-title'),list=document.getElementById('bulk-preview-list'),excluded=document.getElementById('bulk-excluded');const matched=bulkCandidates.length+bulkExcluded.length;
+  preview.style.display='block';summary.innerHTML=`<div><div class="summary-count">${matched}日</div><div class="summary-label">指定した日</div></div><div class="summary-arrow">→</div><div><div class="summary-count">${bulkCandidates.length}日</div><div class="summary-label">登録予定</div></div>`;title.textContent=`登録予定：${bulkCandidates.length}日`;
+  list.innerHTML=bulkCandidates.length?bulkCandidates.map(item=>`<div class="preview-row"><span>${formatJPDate(item.date)}</span><span class="preview-badge">${escapeHtml(item.label)}</span></div>`).join(''):'<div class="preview-row"><span>登録できる日はありません。</span></div>';
+  if(bulkExcluded.length){excluded.classList.remove('none');excluded.innerHTML=`<div class="excluded-title">⚠️ 登録されない日：${bulkExcluded.length}日</div><div class="excluded-list">${bulkExcluded.map(item=>`<div class="excluded-row"><span>${formatJPDate(item.date)}</span><span class="excluded-reason">${escapeHtml(item.reason||'対象外')}</span></div>`).join('')}</div>`;}
+  else{excluded.classList.add('none');excluded.innerHTML='<div class="excluded-title">登録されない日：0日</div><div>指定した条件の日は、すべて登録予定です。</div>';}
+  const card=document.getElementById('holiday-time-card'),count=document.getElementById('holiday-time-count'),dates=document.getElementById('holiday-time-dates');
+  if(bulkCandidates.length){card.style.display='block';count.textContent=`${bulkCandidates.length}日`;dates.innerHTML=bulkCandidates.slice(0,20).map(x=>`<span class="time-chip">${formatShortDate(x.date)}</span>`).join('')+(bulkCandidates.length>20?`<span class="time-chip">ほか${bulkCandidates.length-20}日</span>`:'');populateTimeSelect('bulk-time-select');}
+  else card.style.display='none';updateSubmitButton();
+}
+
+function resetExistingReservation(clearMessage=true){currentReservation=null;reservationLookupKey='';const card=document.getElementById('existing-card');if(card)card.style.display='none';const le=document.getElementById('lookup-error');if(le){le.style.display='none';le.textContent='';le.className='lookup-error';}if(clearMessage){const m=document.getElementById('existing-operation-message');if(m)m.textContent='';}updateSubmitButton();}
+function showLookupError(msg,type='error'){const el=document.getElementById('lookup-error');el.textContent=msg;el.className='lookup-error'+(type==='info'?' info':type==='success'?' success':'');el.style.display='block';}
+async function lookupExistingReservation(){
+  const childId=document.getElementById('student-select').value,date=document.getElementById('date-select').value;if(!childId){showLookupError('園児名を選択してください。');return;}if(!date){showLookupError('変更・取消する利用日を選択してください。');return;}
+  const j=classifyHolidayDate(date,getOperationMode());if(!j.allowed&&j.type!=='cutoff'){showLookupError(j.reason);return;}
+  const btn=document.getElementById('lookup-reservation-btn');btn.disabled=true;btn.textContent='確認中...';
+  try{const r=await fetch(`${WEB_APP_URL}?action=reservation&child_id=${encodeURIComponent(childId)}&date=${encodeURIComponent(date)}`);const result=await r.json();if(result.status!=="success")throw new Error(result.message||'予約情報を取得できませんでした');const raw=result.reservation||result.data||null;if(!raw||String(raw.status||'active').toLowerCase()==='cancelled'){currentReservation=null;showLookupError('この日の有効な予約は見つかりませんでした。','info');return;}currentReservation={reservation_id:raw.reservation_id||'',date:raw.date||date,end_time:raw.end_time||'',time_code:raw.time_code||'',pickup:raw.pickup||'',memo:raw.memo||'',status:raw.status||'active',input_type:raw.input_type||''};reservationLookupKey=`${childId}|${date}`;renderExistingReservation(j);}
+  catch(e){showLookupError(e.message||'予約情報を取得できませんでした。');}finally{btn.disabled=false;btn.textContent='現在の予約を確認する';}
+}
+function renderExistingReservation(j){
+  const mode=getOperationMode(),option=findTimeOption(currentReservation);document.getElementById('existing-date').textContent=formatJPDate(currentReservation.date);document.getElementById('existing-day-type').textContent=j.holiday?.name||'長期休暇';document.getElementById('existing-time').textContent=option?.label||currentReservation.end_time||'未設定';document.getElementById('existing-pickup').textContent=currentReservation.pickup||'未設定';document.getElementById('existing-memo').textContent=currentReservation.memo||'なし';
+  const msg=document.getElementById('existing-operation-message');msg.className='operation-message '+(mode==='変更'?'change':'cancel');
+  if(mode==='変更'){msg.textContent='現在の予約を確認しました。下の利用時間・お迎え等を変更して送信してください。';populateTimeSelect('time-select');if(option)document.getElementById('time-select').value=option.value;document.getElementById('pickup').value=currentReservation.pickup||'母';document.getElementById('memo').value=currentReservation.memo||'';}
+  else{msg.textContent=j.cancelFee?'この予約は取消できますが、7日前以降のため予約料金の全額がキャンセル料となります。':'この予約を取り消します。';document.getElementById('time-select').disabled=true;}
+  document.getElementById('existing-card').style.display='block';showLookupError('現在の予約を確認しました。','success');updateSubmitButton();
+}
+
+function getCommonData(){const ss=document.getElementById('student-select');return {cls:document.getElementById('class-select').value,studentSelect:ss,child_id:ss.value,pickup:document.getElementById('pickup').value,memo:document.getElementById('memo').value.trim()};}
+async function handleConfirm(){hideError();hideResult();const common=getCommonData();if(!common.cls||!common.child_id){alert('クラス・園児名を選択してください。');return;}if(getReservationType()==='bulk')await handleBulkConfirm(common);else await handleSingleConfirm(common);}
+async function handleSingleConfirm(common){
+  const date=document.getElementById('date-select').value,mode=getOperationMode();if(!date){alert(mode==='新規'?'利用希望日を選択してください。':'変更・取消する利用日を選択してください。');return;}const j=classifyHolidayDate(date,mode);if(!j.allowed){showError(j.reason);return;}
+  if(mode!=='新規'){const key=`${common.child_id}|${date}`;if(!currentReservation||reservationLookupKey!==key){alert('先に「現在の予約を確認する」を押してください。');return;}}
+  let time=null,pickup=common.pickup,memo=common.memo;
+  if(mode==='取消'){const x=findTimeOption(currentReservation);time={end_time:currentReservation.end_time||x?.value||'',time_code:currentReservation.time_code||x?.code||'',label:x?.label||currentReservation.end_time||'現在の登録時間'};pickup=currentReservation.pickup||pickup;memo=currentReservation.memo||'';}
+  else{time=getSelectedTime('time-select');if(!time){alert('利用時間を選択してください。');return;}}
+  const studentName=common.studentSelect.options[common.studentSelect.selectedIndex].text;const data={reservation_type:'single',reservation_context:'holiday',reservation_id:currentReservation?.reservation_id||'',child_id:common.child_id,mode,date,period:'long_holiday',care_available:true,day_length:'full',day_type:'holiday',end_time:time.end_time,time_code:time.time_code,pickup,memo,source:'holiday_TEST_Ver03_work',test_virtual_now:VIRTUAL_NOW?VIRTUAL_NOW.toISOString():''};
+  let text='';
+  if(mode==='変更'){
+    text=`${studentName}
+${formatJPDate(date)}［${j.holiday.name||'長期休暇'}］
+
+変更後：${time.label}
+
+この内容に変更しますか？`;
+  }else if(mode==='取消'){
+    const feeNote=j.cancelFee ? '\n\n⚠ 利用日の7日前以降のため、予約料金の全額がキャンセル料となります。' : '';
+    text=`${studentName}
+${formatJPDate(date)}［${j.holiday.name||'長期休暇'}］ / ${time.label}
+
+この予約を取り消しますか？${feeNote}`;
+  }else{
+    text=`${studentName}
+${formatJPDate(date)}［${j.holiday.name||'長期休暇'}］ / ${time.label}
+新規として送信しますか？`;
+  }
+  if(!confirm(text))return;
+  await postReservation(data,mode==='変更'?'変更中...':mode==='取消'?'取消中...':'送信中...');
+}
+async function handleBulkConfirm(common){
+  if(!buildBulkPreview(true))return;const time=getSelectedTime('bulk-time-select');if(!time){alert('一括登録する利用時間を選択してください。');return;}
+  const weekdays=selectedBulkWeekdays().sort((a,b)=>a-b);const dates=bulkCandidates.map(item=>({date:item.date,period:'long_holiday',care_available:true,day_length:'full',day_type:'holiday',end_time:time.end_time,time_code:time.time_code}));
+  const data={reservation_type:'bulk',reservation_context:'holiday',child_id:common.child_id,mode:'新規',bulk_request:{start_date:document.getElementById('bulk-start').value,end_date:document.getElementById('bulk-end').value,weekdays},client_schedule_year:schedule.school_year||null,dates,time_rules:{holiday:{end_time:time.end_time,time_code:time.time_code}},pickup:common.pickup,memo:common.memo,source:'holiday_TEST_Ver03_work',test_virtual_now:VIRTUAL_NOW?VIRTUAL_NOW.toISOString():''};
+  const name=common.studentSelect.options[common.studentSelect.selectedIndex].text,first=bulkCandidates[0]?.date||'',last=bulkCandidates[bulkCandidates.length-1]?.date||'';if(!confirm(`${name}
+長期休暇の一括登録：${bulkCandidates.length}日
+${first} ～ ${last}
+利用時間：${time.label}
+
+この内容で一括登録しますか？`))return;
+  console.group('すみれクラブ 長期休暇 一括登録 TEST Ver.03 / 送信データ');console.log(data);console.groupEnd();await postReservation(data,`${bulkCandidates.length}日分を登録中...`,true);
+}
+async function postReservation(data,workingText,isBulk=false){
+  const btn=document.getElementById('submit-btn'),restore=btn.textContent;btn.disabled=true;btn.textContent=workingText;
+  try{const r=await fetch(WEB_APP_URL,{method:'POST',body:JSON.stringify(data)});const result=await r.json();if(result.status!=="success")throw new Error(result.message||'予約処理に失敗しました');alert(result.message||'予約処理が完了しました。');if(isBulk)renderResult(result);else if(data.mode!=='新規')resetExistingReservation();}
+  catch(e){alert('送信に失敗しました。\n\n'+e.message);}finally{btn.disabled=false;btn.textContent=restore;updateSubmitButton();}
+}
+function renderResult(result){const box=document.getElementById('result');box.style.display='block';box.innerHTML=`<div class="result-title">一括登録が完了しました</div><div>登録：<strong>${result.saved_count??bulkCandidates.length}日</strong> ／ 登録されなかった日：<strong>${result.excluded_count??bulkExcluded.length}日</strong></div><div class="note">変更・取消は「日別予約」に切り替えて、必要な日だけ行えます。</div>`;}
+function updateSubmitButton(){
+  const btn=document.getElementById('submit-btn');if(!btn)return;btn.classList.remove('change','cancel');
+  if(getReservationType()==='bulk'){btn.textContent=bulkCandidates.length?`${bulkCandidates.length}日分を一括登録する`:'一括登録する';btn.disabled=false;return;}
+  const mode=getOperationMode();if(mode==='変更'){btn.classList.add('change');btn.textContent='予約を変更する';btn.disabled=!currentReservation;}else if(mode==='取消'){btn.classList.add('cancel');btn.textContent='この予約を取り消す';btn.disabled=!currentReservation;}else{btn.textContent='この内容で申し込む';btn.disabled=false;}
+}
+function showError(html){const el=document.getElementById('date-error');el.innerHTML=html;el.style.display='block';}
+function hideError(){const el=document.getElementById('date-error');el.style.display='none';el.innerHTML='';}
+function hideResult(){const el=document.getElementById('result');el.style.display='none';el.innerHTML='';}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));}
+</script>
+</body>
+</html>
