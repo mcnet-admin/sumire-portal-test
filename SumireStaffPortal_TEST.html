@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>すみれクラブ 園スタッフポータル | TEST Ver.05</title>
+<style>
+:root{
+  --sumire:#7655a8;
+  --sumire-dark:#4f3a78;
+  --sumire-soft:#eee7f7;
+  --sumire-pale:#faf7fd;
+  --ink:#2f2b36;
+  --muted:#716a79;
+  --line:#ddd4e8;
+  --white:#fff;
+  --green:#3f7d55;
+  --green-bg:#eff8f2;
+  --gold:#a36c00;
+  --gold-bg:#fff7df;
+  --shadow:0 8px 24px rgba(76,56,105,.08);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
+  background:linear-gradient(180deg,#fbf9fd,#f3eff8);color:var(--ink);line-height:1.65
+}
+.app{max-width:1120px;margin:0 auto;padding:20px 16px 42px}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:13px}
+.brand-small{font-weight:950;color:var(--sumire-dark)}
+.badge{padding:6px 10px;border-radius:999px;background:var(--sumire-soft);color:var(--sumire-dark);font-size:.82rem;font-weight:900}
+.hero{
+  position:relative;overflow:hidden;background:linear-gradient(135deg,var(--sumire-dark),var(--sumire));
+  color:white;border-radius:24px;padding:26px 28px;box-shadow:var(--shadow);margin-bottom:18px
+}
+.hero:after{
+  content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:-92px;top:-108px;
+  background:rgba(255,255,255,.08)
+}
+.hero-grid{
+  position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) 330px;
+  gap:24px;align-items:center
+}
+.hero-copy h1{margin:0 0 6px;font-size:clamp(1.7rem,3vw,2.5rem)}
+.hero-copy p{margin:0;color:#f3eefb;max-width:720px}
+.notice{
+  margin-top:18px;display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:12px;
+  background:rgba(255,255,255,.13);font-weight:800
+}
+.hero-brand{
+  justify-self:end;display:grid;grid-template-columns:142px 1fr;gap:12px;align-items:center;
+  min-width:300px;padding:10px 12px;border-radius:18px;background:rgba(255,255,255,.92);
+  color:var(--sumire-dark);box-shadow:0 6px 20px rgba(45,28,75,.12)
+}
+.hero-brand-mark{
+  width:142px;height:118px;overflow:hidden;border-radius:14px;
+  background-image:url("img/sumire_lab_logo.png");
+  background-repeat:no-repeat;background-position:center 19%;background-size:170px auto
+}
+.hero-brand-text{line-height:1.35}
+.hero-brand-text strong{display:block;font-size:1.05rem;letter-spacing:.02em}
+.hero-brand-text span{display:block;margin-top:7px;font-size:.76rem;font-weight:900;letter-spacing:.16em;color:#9a7bc7}
+.section{background:white;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+.section h2{margin:0 0 13px;color:var(--sumire-dark);font-size:1.17rem}
+.menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.menu-card{
+  position:relative;display:block;text-decoration:none;color:var(--ink);padding:18px;border:1px solid var(--line);
+  border-radius:16px;background:linear-gradient(180deg,#fff,#fcfafd);transition:.15s ease
+}
+.menu-card:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(77,56,107,.09);border-color:#c9bae0}
+.menu-card .icon{font-size:1.55rem}
+.menu-card h3{margin:6px 0 4px;color:var(--sumire-dark);font-size:1.07rem}
+.menu-card p{margin:0;color:var(--muted);font-size:.92rem}
+.menu-card .go{position:absolute;right:15px;top:15px;color:var(--sumire);font-weight:950}
+.menu-card.ready{border-left:5px solid var(--sumire)}
+.menu-card.future{background:#faf9fb;color:#857f89}
+.menu-card.future h3{color:#706a76}
+.status-pill{display:inline-block;margin-top:9px;padding:4px 8px;border-radius:999px;font-size:.76rem;font-weight:900}
+.status-pill.live{background:var(--green-bg);color:var(--green)}
+.status-pill.test{background:var(--sumire-soft);color:var(--sumire-dark)}
+.status-pill.wait{background:#eee;color:#777}
+.flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.flow-item{padding:15px;border-radius:14px;background:var(--sumire-pale);border:1px solid #e7dff0}
+.flow-item strong{display:block;color:var(--sumire-dark);margin-bottom:3px}
+.flow-item p{margin:0;color:var(--muted);font-size:.9rem}
+.alert{background:var(--gold-bg);border:1px solid #ead8a7;border-radius:14px;padding:14px 15px}
+.alert strong{color:#6e4a00}
+.footer{color:var(--muted);font-size:.86rem;text-align:center;padding-top:4px}
+@media(max-width:860px){
+  .hero-grid{grid-template-columns:1fr}
+  .hero-brand{justify-self:start;min-width:0;width:min(100%,360px)}
+}
+@media(max-width:720px){
+  .menu-grid,.flow{grid-template-columns:1fr}
+  .hero{padding:22px 18px}
+  .hero-brand{grid-template-columns:108px 1fr}
+  .hero-brand-mark{width:108px;height:92px;background-size:132px auto}
+  .hero-brand-text strong{font-size:.95rem}
+  .hero-brand-text span{font-size:.68rem;letter-spacing:.12em}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topline">
+    <div class="brand-small">🌸 Sumire Portal TEST</div>
+    <span class="badge">園スタッフ用ポータル・TEST Ver.05</span>
+  </div>
+
+  <header class="hero">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <h1>すみれクラブ 園スタッフポータル</h1>
+        <p>日々の予約対応、利用実績の確認、月次集計・請求まで、園スタッフが使う画面への入口です。</p>
+        <div class="notice">🔐 園スタッフは、Apps Scriptや内部コードを操作しません。</div>
+      </div>
+
+      <div class="hero-brand" aria-label="すみれクラブ予約システム 管理画面">
+        <div class="hero-brand-mark" aria-hidden="true"></div>
+        <div class="hero-brand-text">
+          <strong>すみれクラブ予約システム<br>管理画面</strong>
+          <span>SUMIRE STAFF PORTAL</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="section">
+    <h2>🧭 業務メニュー</h2>
+    <div class="menu-grid">
+      <a class="menu-card ready" href="https://script.google.com/a/macros/mclean.ed.jp/s/AKfycbwSqtBljd7I6Fa1rM5bJvXFojvO2Wr0nVOuMhVAzlrHRarpP7TfhUN7KhTdrv52UYqz/exec?action=staff_phone">
+        <span class="go">›</span>
+        <div class="icon">☎️</div>
+        <h3>電話受付・予約修正</h3>
+        <p>電話で受けた予約変更・取消を登録します。</p>
+        <span class="status-pill test">接続TEST</span>
+      </a>
+
+      <a class="menu-card ready" href="monthly_admin_TEST.html">
+        <span class="go">›</span>
+        <div class="icon">📊</div>
+        <h3>月次集計・請求管理</h3>
+        <p>平日・長期休暇の利用実績、未確定、キャンセル料金、請求額を確認します。</p>
+        <span class="status-pill test">TEST Ver.03</span>
+      </a>
+
+      <a class="menu-card ready" href="UsageActualsGuide_TEST.html">
+        <span class="go">›</span>
+        <div class="icon">✅</div>
+        <h3>利用実績の確認・修正</h3>
+        <p>利用した／しなかった、実際の終了時刻などを確認する画面です。</p>
+        <span class="status-pill test">操作説明 Ver.01</span>
+      </a>
+
+      <a class="menu-card future" href="#">
+        <div class="icon">📅</div>
+        <h3>翌日の利用予定</h3>
+        <p>15:30締切後に確定した翌日の利用予定を確認します。</p>
+        <span class="status-pill wait">確認画面は今後検討</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>🕒 日々の流れ</h2>
+    <div class="flow">
+      <div class="flow-item">
+        <strong>日中</strong>
+        <p>電話受付・予約変更・取消など、必要な事務操作を行います。</p>
+      </div>
+      <div class="flow-item">
+        <strong>15:30</strong>
+        <p>翌日分のWeb受付を締め切ります。</p>
+      </div>
+      <div class="flow-item">
+        <strong>15:35</strong>
+        <p>翌日確定処理が自動で行われ、園スタッフへ確認メールが届きます。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>🧾 月末の流れ</h2>
+    <div class="flow">
+      <div class="flow-item">
+        <strong>① 利用実績を確認</strong>
+        <p>未確定が残っている場合は、園側で利用状況・終了時刻を確認します。</p>
+      </div>
+      <div class="flow-item">
+        <strong>② 請求確定</strong>
+        <p>未確定・料金確認事項がなくなると、請求書作成へ進めます。</p>
+      </div>
+      <div class="flow-item">
+        <strong>③ 請求書を確認</strong>
+        <p>園児ごとの請求内容を確認し、送信工程へつなげます。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="alert">
+      <strong>困ったとき：</strong>
+      画面には、園スタッフが行うべき確認・修正だけを表示します。
+      料金設定やシステム内部のエラーが疑われる場合は、開発・保守担当へ連絡する運用とします。
+    </div>
+  </section>
+
+  <div class="footer">すみれクラブ予約システム ｜ 園スタッフ管理画面 ｜ TEST</div>
+</div>
+</body>
+</html>

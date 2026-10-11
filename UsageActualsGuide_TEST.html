@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>未確定の利用実績を確認する | すみれクラブ TEST Ver.01</title>
+<style>
+:root{
+  --sumire:#7655a8;
+  --sumire-dark:#4f3a78;
+  --sumire-soft:#eee7f7;
+  --sumire-pale:#faf7fd;
+  --ink:#2f2b36;
+  --muted:#716a79;
+  --line:#ddd4e8;
+  --white:#fff;
+  --green:#337a4b;
+  --green-bg:#eef8f1;
+  --gold:#8a5a00;
+  --gold-bg:#fff7df;
+  --danger:#9f3139;
+  --danger-bg:#fff0f1;
+  --shadow:0 8px 24px rgba(76,56,105,.08);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
+  background:linear-gradient(180deg,#fbf9fd,#f3eff8);color:var(--ink);line-height:1.7
+}
+.app{max-width:1040px;margin:0 auto;padding:18px 16px 42px}
+.logo-panel{
+  display:flex;justify-content:center;align-items:center;margin:0 auto 14px;padding:8px 14px;
+  background:rgba(255,255,255,.78);border:1px solid rgba(221,212,232,.75);border-radius:20px;
+  box-shadow:0 4px 16px rgba(76,56,105,.04)
+}
+.logo-panel img{display:block;width:min(260px,72vw);height:auto}
+.topbar{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:13px}
+.nav{display:flex;gap:8px;flex-wrap:wrap}
+.nav a{
+  display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:7px 13px;
+  border:1px solid var(--line);border-radius:10px;background:white;color:var(--sumire-dark);
+  font-weight:850;text-decoration:none
+}
+.badge{padding:6px 10px;border-radius:999px;background:var(--sumire-soft);color:var(--sumire-dark);font-size:.82rem;font-weight:900}
+.hero{
+  background:linear-gradient(135deg,var(--sumire-dark),var(--sumire));color:white;border-radius:22px;
+  padding:24px 25px;box-shadow:var(--shadow);margin-bottom:16px
+}
+.hero h1{margin:0 0 6px;font-size:clamp(1.45rem,2.5vw,2.15rem)}
+.hero p{margin:0;color:#f2edf9}
+.card{background:white;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+.card h2{margin:0 0 12px;color:var(--sumire-dark);font-size:1.16rem}
+.summary{
+  display:grid;grid-template-columns:180px 1fr;gap:14px;align-items:stretch
+}
+.status{
+  border-radius:15px;padding:17px;background:var(--danger-bg);border:1px solid #efc7c7
+}
+.status strong{display:block;color:var(--danger);font-size:1.15rem;margin-bottom:6px}
+.status p{margin:0;color:var(--muted)}
+.message{
+  border-radius:15px;padding:17px;background:var(--gold-bg);border:1px solid #ead8a7
+}
+.message strong{display:block;color:#6e4a00;margin-bottom:4px}
+.message p{margin:0}
+.steps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.step{
+  position:relative;padding:17px 16px 16px 54px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(180deg,#fff,#fcfafd)
+}
+.num{
+  position:absolute;left:14px;top:15px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:var(--sumire);color:white;font-weight:950
+}
+.step h3{margin:0 0 4px;color:var(--sumire-dark);font-size:1rem}
+.step p{margin:0;color:var(--muted);font-size:.92rem}
+.choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.choice{padding:16px;border-radius:14px;border:1px solid var(--line)}
+.choice.used{background:var(--green-bg);border-color:#cce4d3}
+.choice.notused{background:#f8f6fb}
+.choice h3{margin:0 0 5px;font-size:1rem}
+.choice p{margin:0;color:var(--muted);font-size:.92rem}
+.do-not{
+  padding:14px 15px;border-left:4px solid var(--sumire);background:var(--sumire-pale);border-radius:10px;color:var(--muted)
+}
+.do-not strong{color:var(--sumire-dark)}
+.actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:10px 16px;border-radius:11px;
+  font-weight:900;text-decoration:none;border:0
+}
+.btn-secondary{background:var(--sumire-soft);color:var(--sumire-dark)}
+.btn-disabled{background:#ebe8ef;color:#9992a4;cursor:not-allowed}
+.future{
+  margin-top:10px;color:var(--muted);font-size:.88rem
+}
+@media(max-width:720px){
+  .summary,.steps,.choice-grid{grid-template-columns:1fr}
+  .actions .btn{width:100%}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="logo-panel"><img src="img/sumire_lab_logo.png" alt="すみれクラブ予約システム開発室 SUMIRE LAB"></div>
+
+  <div class="topbar">
+    <div class="nav">
+      <a href="monthly_admin_TEST.html">◀ 月次集計・請求管理</a>
+      <a href="SumireStaffPortal_TEST.html">🏠 園スタッフポータル</a>
+    </div>
+    <span class="badge">園スタッフ用・操作説明 TEST Ver.01</span>
+  </div>
+
+  <header class="hero">
+    <h1>✅ 未確定の利用実績を確認する</h1>
+    <p>「請求確定不可」と表示されたとき、園スタッフが何を確認すればよいかを示すページです。</p>
+  </header>
+
+  <section class="card">
+    <h2>まず確認すること</h2>
+    <div class="summary">
+      <div class="status">
+        <strong>未確定があります</strong>
+        <p>例：未確定 2件</p>
+      </div>
+      <div class="message">
+        <strong>園側で行うこと</strong>
+        <p>該当する園児について、実際に利用したかどうかと、利用した場合の終了時刻を確認します。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>確認の流れ</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <h3>未確定の園児・日付を確認</h3>
+        <p>月次集計画面の「要確認」から、未確定になっている園児と利用日を確認します。</p>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h3>当日の利用状況を確認</h3>
+        <p>園の記録と照合し、その日に「利用した」か「利用しなかった」かを確認します。</p>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h3>利用した場合は終了時刻を確認</h3>
+        <p>実際のお迎え・終了時刻を確認します。園スタッフは時刻を選ぶだけで、内部の料金コードは扱いません。</p>
+      </div>
+      <div class="step">
+        <div class="num">4</div>
+        <h3>画面で確定して保存</h3>
+        <p>利用実績確認画面で内容を確定します。保存後の日時などはシステム側で記録する想定です。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>入力する内容の考え方</h2>
+    <div class="choice-grid">
+      <div class="choice used">
+        <h3>🟢 利用した場合</h3>
+        <p>「利用あり」を選び、実際の終了時刻を確認して入力します。料金区分はシステム側で扱います。</p>
+      </div>
+      <div class="choice notused">
+        <h3>⚪ 利用しなかった場合</h3>
+        <p>「利用なし」を選びます。キャンセル料金の扱いは、確定した運用規定に基づきシステム側で反映する設計とします。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>園スタッフがしないこと</h2>
+    <div class="do-not">
+      <strong>Apps Script、内部コード、料金コード、トリガーは操作しません。</strong><br>
+      画面上で「利用した／しなかった」「終了時刻」など、園の業務記録から確認できる内容だけを扱います。
+      システム内部の確認が必要な場合は、開発・保守担当へ連絡します。
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>確認後</h2>
+    <p>
+      未確定がすべて解消され、料金設定の確認事項もなければ、月次集計画面は
+      「請求確定可」に切り替わり、請求書作成へ進める状態になります。
+    </p>
+    <div class="actions">
+      <a class="btn btn-secondary" href="monthly_admin_TEST.html">◀ 月次集計・請求管理へ戻る</a>
+      <span class="btn btn-disabled">利用実績の入力画面へ（次工程で接続）</span>
+    </div>
+    <div class="future">※このVer.01は操作説明ページです。実際の利用実績入力GUIは次工程で設計・接続します。</div>
+  </section>
+</div>
+</body>
+</html>
