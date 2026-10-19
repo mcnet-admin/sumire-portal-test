@@ -59,6 +59,9 @@
   .preview-list{display:grid;gap:6px;max-height:280px;overflow-y:auto}
   .preview-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:#fff8ee;font-size:14px}
   .preview-badge{white-space:nowrap;font-size:12px;font-weight:700;padding:3px 7px;border-radius:999px;background:#ffe5c2;color:#a34c00}
+  .closed-days-notice{margin:10px 0 13px;padding:13px 14px;background:#fff1da;border:2px solid #e99c31;border-radius:10px;color:#704500;line-height:1.65;font-size:14px}
+  .closed-days-notice strong{color:#9a3e00}
+  .closed-days-notice .closed-detail{font-size:12px;margin-top:5px;color:#80613a}
   .excluded-box{margin-top:14px;padding:12px;border-radius:9px;border:1px solid #f3d58b;background:#fffaf0;font-size:13px;color:#5f4a19;line-height:1.6}
   .excluded-box.none{border-color:#d9eadb;background:#f7fbf8;color:#57705c}
   .excluded-title{font-weight:800;color:#9a6700;margin-bottom:7px}
@@ -263,6 +266,7 @@
     <button type="button" class="bulk-action" onclick="buildBulkPreview(true)">対象日を確認する</button>
     <p class="note">※長期休暇期間外、土日祝、預かりなしの日、受付開始前、締切後の日は登録対象から外します。予約済みの日が含まれる場合は、安全のため一括登録を中止します。</p>
     <div id="bulk-preview" class="bulk-preview">
+      <div id="bulk-closed-days-notice" class="closed-days-notice" role="status" aria-live="polite"></div>
       <div id="bulk-preview-summary" class="preview-summary"></div>
       <div id="bulk-preview-title" class="preview-title"></div>
       <div id="bulk-preview-list" class="preview-list"></div>
@@ -933,10 +937,32 @@ function buildBulkPreview(showValidationMessage=false){
 }
 function renderBulkPreview(){
   const preview=document.getElementById('bulk-preview'),summary=document.getElementById('bulk-preview-summary'),title=document.getElementById('bulk-preview-title'),list=document.getElementById('bulk-preview-list'),excluded=document.getElementById('bulk-excluded');const matched=bulkCandidates.length+bulkExcluded.length;
-  preview.style.display='block';summary.innerHTML=`<div><div class="summary-count">${matched}日</div><div class="summary-label">指定した日</div></div><div class="summary-arrow">→</div><div><div class="summary-count">${bulkCandidates.length}日</div><div class="summary-label">登録予定</div></div>`;title.textContent=`登録予定：${bulkCandidates.length}日`;
+  // 期間全体を集計し、曜日フィルターで除外された土日も必ず保護者に通知する。
+  const startStr=document.getElementById('bulk-start').value;
+  const endStr=document.getElementById('bulk-end').value;
+  const start=parseISODate(startStr),end=parseISODate(endStr);
+  const weekdays=selectedBulkWeekdays();
+  let totalDays=0,weekendDays=0,holidayDays=0,unselectedWeekdays=0;
+  if(start&&end&&start<=end){
+    const cursor=new Date(start);
+    while(cursor<=end){
+      totalDays++;
+      const dateText=formatISODate(cursor),dow=cursor.getDay();
+      if(dow===0||dow===6)weekendDays++;
+      else if(NATIONAL_HOLIDAYS_V05[dateText])holidayDays++;
+      else if(!weekdays.includes(dow))unselectedWeekdays++;
+      cursor.setDate(cursor.getDate()+1);
+    }
+  }
+  const notice=document.getElementById('bulk-closed-days-notice');
+  const closeCount=weekendDays+holidayDays;
+  notice.innerHTML=closeCount
+    ? `<strong>⚠️ 閉園日を自動的に除外しました（${closeCount}日）</strong><div>土曜日・日曜日：<strong>${weekendDays}日</strong> ／ 祝日：<strong>${holidayDays}日</strong></div><div class="closed-detail">これらの日は予約されません。${unselectedWeekdays?`曜日指定による対象外：${unselectedWeekdays}日。`:''}</div>`
+    : `<strong>閉園日（土日祝）の該当はありません。</strong>${unselectedWeekdays?`<div class="closed-detail">曜日指定による対象外：${unselectedWeekdays}日。</div>`:''}`;
+  preview.style.display='block';summary.innerHTML=`<div><div class="summary-count">${totalDays}日</div><div class="summary-label">指定期間</div></div><div class="summary-arrow">→</div><div><div class="summary-count">${bulkCandidates.length}日</div><div class="summary-label">登録予定</div></div>`;title.textContent=`登録予定：${bulkCandidates.length}日`;
   list.innerHTML=bulkCandidates.length?bulkCandidates.map(item=>`<div class="preview-row"><span>${formatJPDate(item.date)}</span><span class="preview-badge">${escapeHtml(item.label)}</span></div>`).join(''):'<div class="preview-row"><span>登録できる日はありません。</span></div>';
-  if(bulkExcluded.length){excluded.classList.remove('none');excluded.innerHTML=`<div class="excluded-title">⚠️ 登録されない日：${bulkExcluded.length}日</div><div class="excluded-list">${bulkExcluded.map(item=>`<div class="excluded-row"><span>${formatJPDate(item.date)}</span><span class="excluded-reason">${escapeHtml(item.reason||'対象外')}</span></div>`).join('')}</div>`;}
-  else{excluded.classList.add('none');excluded.innerHTML='<div class="excluded-title">登録されない日：0日</div><div>指定した条件の日は、すべて登録予定です。</div>';}
+  if(bulkExcluded.length){excluded.classList.remove('none');excluded.innerHTML=`<div class="excluded-title">⚠️ その他の登録対象外：${bulkExcluded.length}日</div><div class="excluded-list">${bulkExcluded.map(item=>`<div class="excluded-row"><span>${formatJPDate(item.date)}</span><span class="excluded-reason">${escapeHtml(item.reason||'対象外')}</span></div>`).join('')}</div>`;}
+  else{excluded.classList.add('none');excluded.innerHTML='<div class="excluded-title">その他の登録対象外：0日</div><div>閉園日以外の対象日は、すべて登録予定です。</div>';}
   const card=document.getElementById('holiday-time-card'),count=document.getElementById('holiday-time-count'),dates=document.getElementById('holiday-time-dates');
   if(bulkCandidates.length){card.style.display='block';count.textContent=`${bulkCandidates.length}日`;dates.innerHTML=bulkCandidates.slice(0,20).map(x=>`<span class="time-chip">${formatShortDate(x.date)}</span>`).join('')+(bulkCandidates.length>20?`<span class="time-chip">ほか${bulkCandidates.length-20}日</span>`:'');populateTimeSelect('bulk-time-select');}
   else card.style.display='none';updateSubmitButton();
