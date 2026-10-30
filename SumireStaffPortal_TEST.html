@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>すみれクラブ 園スタッフポータル | TEST Ver.05</title>
+<title>すみれクラブ 園スタッフポータル | TEST Ver.06</title>
 <style>
 :root{
   --sumire:#7655a8;
@@ -104,7 +104,7 @@ body{
 <div class="app">
   <div class="topline">
     <div class="brand-small">🌸 Sumire Portal TEST</div>
-    <span class="badge">園スタッフ用ポータル・TEST Ver.05</span>
+    <span class="badge">園スタッフ用ポータル・TEST Ver.06</span>
   </div>
 
   <header class="hero">
@@ -128,37 +128,49 @@ body{
   <section class="section">
     <h2>🧭 業務メニュー</h2>
     <div class="menu-grid">
-      <a class="menu-card ready" href="https://script.google.com/macros/s/AKfycbzU5c2qPH-U7HitZBEptauUNB2dHR7-nnMi6HQu_awb_QmDMDK6HfVwV6UE19D3F32P/exec?action=staff_phone">
+      <a class="menu-card ready" href="https://script.google.com/macros/s/AKfycbwSqtBljd7I6Fa1rM5bJvXFojvO2Wr0nVOuMhVAzlrHRarpP7TfhUN7KhTdrv52UYqz/exec?action=staff_phone">
         <span class="go">›</span>
         <div class="icon">☎️</div>
         <h3>電話受付・予約修正</h3>
-        <p>電話で受けた予約変更・取消を登録します。</p>
+        <p>電話で受けた新規予約・変更・取消を、GASの受付画面で登録します。</p>
         <span class="status-pill test">接続TEST</span>
       </a>
 
-      <a class="menu-card ready" href="monthly_admin_TEST.html">
+      <a class="menu-card ready" href="https://script.google.com/macros/s/AKfycbwSqtBljd7I6Fa1rM5bJvXFojvO2Wr0nVOuMhVAzlrHRarpP7TfhUN7KhTdrv52UYqz/exec?action=monthly_admin" target="_top">
         <span class="go">›</span>
         <div class="icon">📊</div>
         <h3>月次集計・請求管理</h3>
-        <p>平日・長期休暇の利用実績、未確定、キャンセル料金、請求額を確認します。</p>
-        <span class="status-pill test">TEST Ver.03</span>
+        <p>平日の月次集計・未確定・請求額を確認します。長期休暇料金とキャンセル料金の月次反映は開発中です。</p>
+        <span class="status-pill test">月次管理画面 TEST</span>
+      </a>
+
+      <a class="menu-card ready" href="https://script.google.com/macros/s/AKfycbwSqtBljd7I6Fa1rM5bJvXFojvO2Wr0nVOuMhVAzlrHRarpP7TfhUN7KhTdrv52UYqz/exec?action=monthly_admin" target="_top">
+        <span class="go">›</span>
+        <div class="icon">💴</div>
+        <h3>臨時徴収の登録・修正</h3>
+        <p>月次管理画面の「臨時徴収」欄で、全園児共通・園児別の料金を登録・修正します。</p>
+        <span class="status-pill test">既存画面を利用</span>
       </a>
 
       <a class="menu-card ready" href="UsageActualsGuide_TEST.html">
         <span class="go">›</span>
         <div class="icon">✅</div>
-        <h3>利用実績の確認・修正</h3>
-        <p>利用した／しなかった、実際の終了時刻などを確認する画面です。</p>
+        <h3>利用実績の確認方法</h3>
+        <p>未確定の利用実績について、園スタッフが確認・修正する手順を説明します。</p>
         <span class="status-pill test">操作説明 Ver.01</span>
       </a>
 
-      <a class="menu-card future" href="#">
+      <div class="menu-card future" aria-disabled="true">
         <div class="icon">📅</div>
         <h3>翌日の利用予定</h3>
         <p>15:30締切後に確定した翌日の利用予定を確認します。</p>
         <span class="status-pill wait">確認画面は今後検討</span>
-      </a>
+      </div>
     </div>
+  </section>
+
+  <section class="section">
+    <div class="alert"><strong>職員専用画面の利用：</strong> このポータルは業務画面への入口です。公開URLを知っているだけで操作できないよう、GAS側のアカウント認証・アクセス権限を本番移行前に確認します。</div>
   </section>
 
   <section class="section">
@@ -205,7 +217,7 @@ body{
     </div>
   </section>
 
-  <div class="footer">すみれクラブ予約システム ｜ 園スタッフ管理画面 ｜ TEST</div>
+  <div class="footer">すみれクラブ予約システム ｜ 園スタッフ管理画面 ｜ TEST Ver.06 ｜ 2026-10-30改訂</div>
 </div>
 </body>
 </html>
