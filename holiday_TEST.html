@@ -147,7 +147,7 @@
 <body>
 <div class="container">
   <a href="index.html" class="btn-back">← ポータル画面へ戻る</a>
-  <h1>預かり保育予約 <span style="font-size:14px;color:#ef6c00;">[長期休暇版 TEST Ver.09 キャンセル料事前表示]</span></h1>
+  <h1>預かり保育予約 <span style="font-size:14px;color:#ef6c00;">[長期休暇版 TEST Ver.10 キャンセル料金・仮想日時照合]</span></h1>
 
   <div class="test-note">
     長期休暇版は<strong>一括登録を基本</strong>にしています。まとめて登録した予約も、Google側では1日ごとの予約として保存します。<br>
@@ -193,7 +193,7 @@
 
     <button type="button" class="virtual-btn reset" onclick="clearVirtualNow()">実日時に戻す</button>
     <div id="virtual-now-status" class="virtual-now-status">現在は実日時で判定しています。</div>
-    <p class="note" style="margin-bottom:0;">※画面の仮想日時はHTML内の判定用です。GAS側のキャンセル料金は原則として実日時で計算されます。TEST専用関数でGAS仮想日時を設定した場合は、その日時で計算されます。</p>
+    <p class="note" style="margin-bottom:0;">※画面の仮想日時だけではGAS側の日時は変更されません。取消TESTではGAS側のTEST仮想日時設定も必要です。両者が一致しなければ取消を停止します。</p>
   </div>
   <div id="date-error" class="error-box"></div>
   <div id="schedule-status" class="schedule-status"></div>
@@ -336,7 +336,7 @@
   <div id="diagnostic-v07" style="margin-top:12px;padding:12px;border:2px solid #7161ae;border-radius:10px;background:#f8f6ff;color:#312354;font-size:13px;line-height:1.7;display:none" aria-live="polite"></div>
 </div>
 
-<!-- holiday_TEST.html / TEST Ver.09 / cancellation_quote_v09 + closed_days + early_care 2026-10-19 -->
+<!-- holiday_TEST.html / TEST Ver.10 / cancellation_quote_v09 + clock/quote validation -->
 <script>
 const WEB_APP_URL='https://script.google.com/macros/s/AKfycbwSqtBljd7I6Fa1rM5bJvXFojvO2Wr0nVOuMhVAzlrHRarpP7TfhUN7KhTdrv52UYqz/exec';
 const TEST_BYPASS_RESERVATION_START=false;
@@ -1075,9 +1075,9 @@ function showDiagnosticV07(phase,info){
   const safe=(v)=>String(v===undefined?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const lines=[['確認段階',phase],...Object.entries(info||{})];
   box.style.display='block';
-  box.innerHTML='<strong>TEST Ver.09 ／ 予約診断（送信結果）</strong><div style="margin-top:5px">'+
+  box.innerHTML='<strong>TEST Ver.10 ／ 予約診断（送信結果）</strong><div style="margin-top:5px">'+
     lines.map(([k,v])=>'<div><strong>'+safe(k)+'：</strong>'+safe(typeof v==='object'?JSON.stringify(v):v)+'</div>').join('')+'</div>';
-  console.info('[Sumire TEST Ver.09診断]',phase,info);
+  console.info('[Sumire TEST Ver.10診断]',phase,info);
 }
 function dateListV07(items){return (items||[]).map(x=>x.date||x).join('、')||'なし';}
 function getCommonData(){const ss=document.getElementById('student-select');return {cls:document.getElementById('class-select').value,studentSelect:ss,child_id:ss.value,pickup:document.getElementById('pickup').value,memo:document.getElementById('memo').value.trim()};}
@@ -1217,7 +1217,7 @@ ${first} ～ ${last}
 
 この内容で一括登録しますか？`))return;
 
-  console.group('すみれクラブ 長期休暇 一括登録 TEST Ver.09 / 送信データ');
+  console.group('すみれクラブ 長期休暇 一括登録 TEST Ver.10 / 送信データ');
   console.log(data);
   console.groupEnd();
 
