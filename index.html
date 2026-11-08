@@ -6,19 +6,20 @@
   <title>Sumire Lab TEST | すみれクラブ予約ポータル</title>
   <style>
     :root{
-      --bg:#fffaf5;
+      --bg:#f8f5fc;
       --card:#ffffff;
-      --line:#eadfd2;
-      --text:#2f2f2f;
-      --sub:#666;
-      --accent:#9a6700;
-      --accent-bg:#fff3e0;
+      --line:#e4dbea;
+      --text:#2f2b36;
+      --sub:#655e6e;
+      --accent:#7655a8;
+      --accent-dark:#4f3a78;
+      --accent-bg:#efe8f8;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
       font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
-      background:var(--bg);
+      background:linear-gradient(180deg,#fbf9fd 0%,var(--bg) 100%);
       color:var(--text);
       line-height:1.7;
     }
@@ -27,18 +28,28 @@
       margin:0 auto;
       padding:40px 0 56px;
     }
-    header{text-align:center;margin-bottom:28px}
-    h1{font-size:clamp(26px,5vw,40px);margin:0 0 8px}
+    header{
+      text-align:center;
+      margin-bottom:28px;
+      padding:34px 22px 30px;
+      border-radius:24px;
+      color:#fff;
+      background:linear-gradient(120deg,var(--accent-dark),var(--accent));
+      box-shadow:0 12px 30px rgba(79,58,120,.15);
+    }
+    h1{font-size:clamp(26px,5vw,40px);margin:9px 0 8px;letter-spacing:.015em}
     .badge{
       display:inline-block;
-      padding:4px 10px;
+      padding:4px 11px;
       border-radius:999px;
-      background:#f3f3f3;
+      background:rgba(255,255,255,.18);
+      color:#fff;
       font-size:13px;
       font-weight:700;
       letter-spacing:.04em;
+      border:1px solid rgba(255,255,255,.32);
     }
-    .lead{margin:18px auto 0;max-width:660px;color:var(--sub)}
+    .lead{margin:18px auto 0;max-width:660px;color:#f5effd}
     .grid{
       display:grid;
       grid-template-columns:repeat(2,minmax(0,1fr));
@@ -46,14 +57,16 @@
       margin-top:28px;
     }
     .card{
+      display:flex;
+      flex-direction:column;
       background:var(--card);
       border:1px solid var(--line);
       border-radius:16px;
-      padding:22px;
-      box-shadow:0 4px 16px rgba(0,0,0,.04);
+      padding:24px;
+      box-shadow:0 4px 18px rgba(79,58,120,.07);
     }
-    .card h2{margin:0 0 8px;font-size:21px}
-    .card p{margin:0 0 18px;color:var(--sub)}
+    .card h2{margin:0 0 8px;font-size:21px;color:var(--accent-dark)}
+    .card p{margin:0 0 18px;color:var(--sub);flex:1}
     .btn{
       display:block;
       text-align:center;
@@ -63,21 +76,28 @@
       font-weight:800;
       padding:13px 16px;
       border-radius:10px;
+      transition:background-color .2s ease,transform .2s ease;
     }
+    .card:nth-child(2) .btn{background:var(--accent-dark)}
+    .btn:hover{background:#60438f;transform:translateY(-1px)}
+    .card:nth-child(2) .btn:hover{background:#3d2c61}
+    .btn:focus-visible{outline:3px solid #a58ac9;outline-offset:3px}
     .note{
       margin-top:24px;
       background:var(--accent-bg);
-      border:1px solid #f0d9b6;
+      border:1px solid #d6c8e6;
       border-radius:12px;
       padding:14px 16px;
-      color:#684600;
+      color:var(--accent-dark);
       font-size:14px;
     }
-    footer{margin-top:28px;text-align:center;color:#888;font-size:12px}
+    footer{margin-top:28px;text-align:center;color:#77717d;font-size:12px}
     @media(max-width:680px){
       .grid{grid-template-columns:1fr}
-      .wrap{padding-top:28px}
+      .wrap{padding-top:16px}
+      header{padding:26px 14px;border-radius:18px}
     }
+    @media(prefers-reduced-motion:reduce){.btn{transition:none}.btn:hover{transform:none}}
   </style>
 </head>
 <body>
