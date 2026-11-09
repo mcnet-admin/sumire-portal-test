@@ -339,6 +339,10 @@
 <!-- holiday_TEST.html / TEST Ver.10 / cancellation_quote_v09 + clock/quote validation -->
 <script>
 const WEB_APP_URL='https://script.google.com/macros/s/AKfycbwSqtBljd7I6Fa1rM5bJvXFojvO2Wr0nVOuMhVAzlrHRarpP7TfhUN7KhTdrv52UYqz/exec';
+
+// 表示名だけ日本語併記。選択値は従来のクラスコードを維持。
+const SUMIRE_CLASS_LABELS=Object.freeze({'TP1':'たんぽぽ','HY1':'ひよこ１','HY2':'ひよこ２','KT1':'ことり１','KT2':'ことり２','HK1':'ひかり１','HK2':'ひかり２'});
+function sumireDisplayClass(cls){return SUMIRE_CLASS_LABELS[cls]?cls+'（'+SUMIRE_CLASS_LABELS[cls]+'）':cls;}
 const TEST_BYPASS_RESERVATION_START=false;
 const HOLIDAY_TEST_VERSION='Ver.10_cancellation_clock_quote';
 let VIRTUAL_NOW=null;
@@ -684,7 +688,7 @@ async function init(){
 
     studentData={};
     children.forEach(c=>{const cls=c.class_name||c.class||'';if(!cls)return;if(!studentData[cls])studentData[cls]=[];studentData[cls].push({id:c.child_id,name:c.name});});
-    const cs=document.getElementById('class-select');cs.innerHTML='<option value="">選択してください</option>';Object.keys(studentData).sort().forEach(cls=>cs.add(new Option(cls,cls)));
+    const cs=document.getElementById('class-select');cs.innerHTML='<option value="">選択してください</option>';Object.keys(studentData).sort().forEach(cls=>cs.add(new Option(sumireDisplayClass(cls),cls)));
     const today=formatISODate(todayLocal());document.getElementById('date-select').min=today;document.getElementById('bulk-start').min=today;document.getElementById('bulk-end').min=today;
     // Chrome等が前回のフォーム値を復元する場合があるため、開始日・終了日の整合を初期化時にも確認する。
     const bs=document.getElementById('bulk-start'),be=document.getElementById('bulk-end');
