@@ -310,6 +310,10 @@
 
 <script>
 const WEB_APP_URL='https://script.google.com/macros/s/AKfycbwSqtBljd7I6Fa1rM5bJvXFojvO2Wr0nVOuMhVAzlrHRarpP7TfhUN7KhTdrv52UYqz/exec';
+
+// 表示名だけ日本語併記。選択値は従来のクラスコードを維持。
+const SUMIRE_CLASS_LABELS=Object.freeze({'TP1':'たんぽぽ','HY1':'ひよこ１','HY2':'ひよこ２','KT1':'ことり１','KT2':'ことり２','HK1':'ひかり１','HK2':'ひかり２'});
+function sumireDisplayClass(cls){return SUMIRE_CLASS_LABELS[cls]?cls+'（'+SUMIRE_CLASS_LABELS[cls]+'）':cls;}
 const NORMAL_TIME_OPTIONS=[
   {value:'15:00',code:'WD_1500',label:'～15:00'},
   {value:'16:30',code:'WD_1630',label:'～16:30'},
@@ -593,7 +597,7 @@ async function init(){
 
     const cs=document.getElementById('class-select');
     cs.innerHTML='<option value="">選択してください</option>';
-    Object.keys(studentData).sort().forEach(cls=>cs.add(new Option(cls,cls)));
+    Object.keys(studentData).sort().forEach(cls=>cs.add(new Option(sumireDisplayClass(cls),cls)));
 
     const today=formatISODate(new Date());
     document.getElementById('date-select').min=today;
